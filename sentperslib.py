@@ -8,12 +8,13 @@ from nltk.stem.wordnet import WordNetLemmatizer
 import string
 from scipy.spatial import distance
 import sys
+import codecs
 
 bins = 32
 frequency = 3000
 trait_name = ["Openness", "Conscentiousness", "Extraversion",
               "Agreableness", "Neuroticism"]
-gloveFilePath = "../dataset/glove.6B.300d.txt"
+gloveFilePath = "../dataset/glove.6B.300d"
 schwartzNames = ["selfdirection", "stimulation", "hedonism", "achievement",
                  "power", "security", "conformity", "tradition",
                  "benevolence", "universalism"]
@@ -81,15 +82,15 @@ def mean_big5_5lines(dataset_path):
         Return the 5 means
     '''
     big5_mean = []
+    fi = open(dataset_path, "r")
     for i in range(5):
-        fi = open(dataset_path, "r")
         line = fi.readline()
         line = line.rstrip("\n")
         elements = line.split(",")
         mean = np.array(elements, dtype=float)
         mean = np.mean(mean, axis=0)
         big5_mean.append(mean)
-        fi.close()
+    fi.close()
     return big5_mean
 
 
@@ -187,7 +188,8 @@ def compute_centroids(filename):
 
 def loadGloveModel(gloveFile):
     # "Loading Glove Model"
-    # to make it faster https://blog.ekbana.com/loading-glove-pre-trained-word-embedding-model-from-text-file-faster-5d3e8f2b8455
+    # to make it faster
+    # https://blog.ekbana.com/loading-glove-pre-trained-word-embedding-model-from-text-file-faster-5d3e8f2b8455
     f = open(gloveFile, 'r')
     model = {}
     for line in f:
@@ -197,6 +199,60 @@ def loadGloveModel(gloveFile):
         model[word] = embedding
     f.close()
     return model
+
+
+def convert_to_binary(embedding_path):
+    """
+    Here, it takes path to embedding text file provided by glove.
+    :param embedding_path: takes path of the embedding which is in
+    text format or any format other than binary.
+    :return: a binary file of the given embeddings which takes a lot
+    less time to load.
+    """
+    f = codecs.open(embedding_path + ".txt", 'r', encoding='utf-8')
+    wv = []
+    with codecs.open(embedding_path + ".vocab", "w", encoding='utf-8') \
+            as vocab_write:
+        count = 0
+        for line in f:
+            if count == 0:
+                pass
+            else:
+                splitlines = line.split()
+                vocab_write.write(splitlines[0].strip())
+                vocab_write.write("\n")
+                wv.append([float(val) for val in splitlines[1:]])
+            count += 1
+    np.save(embedding_path + ".npy", np.array(wv))
+
+
+def load_embeddings_binary(embeddings_path):
+    """
+    It loads embedding provided by glove which is saved as binary file.
+    Loading of this model is
+    about  second faster than that of loading of txt glove file as model.
+    :param embeddings_path: path of glove file.
+    :return: glove model
+    """
+    with codecs.open(embeddings_path + '.vocab', 'r', 'utf-8') as f_in:
+        index2word = [line.strip() for line in f_in]
+    wv = np.load(embeddings_path + '.npy')
+    model = {}
+    for i, w in enumerate(index2word):
+        model[w] = wv[i]
+    return model
+
+
+def get_w2v(sentence, model):
+    """
+    :param sentence: inputs a single sentences whose
+    word embedding is to be extracted.
+    :param model: inputs glove model.
+    :return: returns numpy array containing word embedding
+    of all words in input sentence.
+    """
+    return np.array([model.get(val, np.zeros(100))
+                    for val in sentence.split()], dtype=np.float64)
 
 
 def clean(doc):
@@ -211,7 +267,8 @@ def clean(doc):
 
 def compute_bhv(text):
     final_bhv = []
-    localModel = loadGloveModel(gloveFilePath)
+    # localModel = loadGloveModel(gloveFilePath)
+    localModel = load_embeddings_binary(gloveFilePath)
     total_words = {}
     cumulative_vectors = {}
     schwartzCentroids = {}
@@ -240,9 +297,7 @@ def compute_bhv(text):
                         which_schwartz = ""
                         for pos in schwartzNames:
                             now_distance = \
-                                distance.euclidean(np.
-                                                   asarray(localModel[word]),
-                                                   schwartzCentroids[pos])
+                                distance.euclidean(np.asarray(localModel.get(word, np.zeros(100)), dtype=float), schwartzCentroids[pos])
                             if now_distance < min_distance:
                                 min_distance = now_distance
                                 which_schwartz = pos
