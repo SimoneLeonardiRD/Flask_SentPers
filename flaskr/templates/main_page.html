@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Sentence Personality">
+	<meta name="keywords" content="Big5, BasicHumanValues, NLP">
+	<meta name="author" content="Simone Leonardi">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sentence Personality</title>
+	<style>
+		table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			margin: 0 auto;
+		}
+
+		td, th {
+			border: 1px solid #0a0000;
+			text-align: center;
+			padding: 8px;
+		}
+
+		tr:nth-child(even) {
+			border: 1px solid #dddddd;
+			background-color: rgb(248, 221, 170);
+		}
+
+		textarea{
+			resize: none;
+			border: 1px solid rgb(248, 158, 41);
+			font    : 1.4em/1.5em "handwriting", cursive, sans-serif;
+			padding : 0 10px;
+			margin  : 0;
+			width   : 60%;
+			background : none;
+		}
+
+	</style>
+ 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" href="#">Sentence Personality</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+				</li>
+				<!--
+				<li class="nav-item">
+					<a class="nav-link" href="#">Link</a>
+				</li>
+				-->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Who We Are						
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="#">Simone Leonardi</a>
+						<a class="dropdown-item" href="#">LINKS Foundation</a>
+						<a class="dropdown-item" href="#">Politecnico di Torino</a>		
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						ML						
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="#">Sentence Personality Pipeline</a>
+						<a class="dropdown-item" href="#">Linguistic Model an Embeddings</a>
+						<a class="dropdown-item" href="#">From Sentence To Personality Scores</a>
+						<a class="dropdown-item" href="#">From Words To Community Scores</a>				
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Psychology						
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="#">Big5</a>
+						<a class="dropdown-item" href="#">Basic Human Values</a>					
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Research						
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="#">Pubblications</a>
+						<a class="dropdown-item" href="#">Future Works</a>			
+				</li>
+			</ul>
+			<!--
+			<form class="form-inline my-2 my-lg-0">
+				<input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+			</form>
+			-->
+		</div>
+	</nav>
+
+	<form method="POST">	
+		<p align="center">
+			<textarea name="text" placeholder="Insert your sentences here (in any language)" required rows="5">{%if insertedtext is defined%}{{insertedtext}}{% endif %}</textarea>
+		</p>
+		<p align="center">
+			<input type="submit" value="Compute Scores">
+			<input type="button" onclick="location.href='twitter';" value="Twitter Login" />
+			<input type="button" onclick="location.href='questionnaire';" value="Questionnaire" />
+		</p>
+	</form>
+
+	<p align="center" >
+		<table>
+			<tr>
+				<th>Big5</th>
+				<th>Openness</th>
+				<th>Conscientiousness</th>
+				<th>Extraversion</th>
+				<th>Agreableness</th>
+				<th>Neuroticism</th>
+			</tr>
+ 
+			<tr>
+				{% if big5scores is defined %}
+					<td>Scores</td>
+					{% for score in big5scores[:-1] %}
+						<td>{{score}} </td>	
+					{% endfor %}					
+			   	{% endif %}
+			</tr>
+		</table>
+		</div>
+	</p>
+
+	<p align="center">
+		<table>
+			<tr>
+				<th>Self Direction</th>
+				<th>Stimulation</th>
+				<th>Hedonism</th>
+				<th>Achievement</th>
+				<th>Power</th>
+				<th>Security</th>
+				<th>Conformity</th>
+				<th>Tradition</th>
+				<th>Benevolence</th>
+				<th>Universalism</th>
+			</tr>
+
+			</tr>
+				{% if bhvscores is defined %}
+					{% for score in bhvscores %}
+						<td>{{score}}</td>
+					{% endfor %}					
+		   		{% endif %}
+			<tr>			 
+		</table>
+	</p>
+
+	<p align="center">
+		{% if big5plot is sameas true %}
+			<image src="{{url_for('static', filename='images/'+filename+'.jpg')}}">
+		{% endif %} 
+	</p>
+</body>
